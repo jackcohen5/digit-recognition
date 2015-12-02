@@ -6,6 +6,7 @@ ___
 2. pip
 3. Pillow (PIL)
 4. NumPy and SciPy
+5. Tkinter
 ___
 
 ### To install (Ubuntu - for OS X, use pip)
@@ -13,6 +14,7 @@ ___
 2. pip - ```sudo apt-get install python-pip```
 3. Pillow (PIL) - ```pip install Pillow```
 4. NumPy and SciPy - ```sudo apt-get install python-numpy python-scipy```
+5. Tkinter - ```sudo apt-get install python-tk```
 ___
 
 ### To run (assuming all dependencies installed)
