@@ -23,3 +23,7 @@ ___
 1. Clone this repo
 2. Change permissions of run.sh (+x)
 3. Run ```./run.sh```
+
+___
+
+In the future I have plans to add more features as well as optimize the code and make it more Object-Oriented
