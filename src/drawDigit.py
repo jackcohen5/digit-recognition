@@ -1,6 +1,7 @@
 from Tkinter import Tk,Canvas,Button
 from PIL import Image,ImageDraw,ImageOps
 import ocr_machine_learning
+import digitASCII
 
 canvasWidth = 100
 canvasHeight = 200
@@ -65,11 +66,17 @@ class DrawDigit(object):
 
 	def recognize(self):
 
+		print "***************************************************"
+		print 'Recognizing the digit...'
+
 		featureVector = ocr_machine_learning.getVector(ImageOps.invert(self.image), self.digitsData)
 		print 'The feature vector for the image is: {0}'.format(featureVector)
+		print "***************************************************"
 
 		finalDigit = ocr_machine_learning.recognizeDigit(featureVector)
-		print 'The digit in the image is: {0}'.format(finalDigit)
+		print 'The digit in the image is:'
+		print digitASCII.digits[finalDigit]
+		print "***************************************************"
 
 		self.clearCanvas()
 		return

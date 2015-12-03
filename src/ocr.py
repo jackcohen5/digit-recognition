@@ -1,6 +1,7 @@
 import ocr_machine_learning
 from PIL import Image
 import os
+import digitASCII
 from drawDigit import DrawDigit
 
 def phaseThree():
@@ -47,11 +48,16 @@ def openImageOCR(digitsData):
 		originalImage.show()
 		print "***************************************************"
 
+		print 'Recognizing the digit...'
+
 		featureVector = ocr_machine_learning.getVector(originalImage,digitsData)
 		print 'The feature vector for the image is: {0}'.format(featureVector)
+		print "***************************************************"
 
 		finalDigit = ocr_machine_learning.recognizeDigit(featureVector)
-		print 'The digit in the image is: {0}'.format(finalDigit)
+		print 'The digit in the image is:'
+		print digitASCII.digits[finalDigit]
+		print "***************************************************"
 
 	except Exception, e:
 		print "Error opening the file!"
