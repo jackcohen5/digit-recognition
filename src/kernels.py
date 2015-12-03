@@ -25,7 +25,7 @@ kernels = [
 		'kernel':  [[  0, -1,  0],
 					[ -1,  5, -1],
 					[  0, -1,  0]],
-		'factor': 1
+		'factor': 2
 
 	},
 	{
@@ -33,21 +33,21 @@ kernels = [
 		'kernel':  [[ -1, -1, -1],
 					[ -1,  8, -1],
 					[ -1, -1, -1]],
-		'factor': 1
+		'factor': 2
 	},
 	{
 		'name': 'Edge Detection',
 		'kernel':  [[ -1, -1, -1],
 					[ -1,  9, -1],
 					[ -1, -1, -1]],
-		'factor': 1
+		'factor': 8
 	},
 	{
 		'name': 'Emboss',
 		'kernel':  [[ -2, -1,  0],
 					[ -1,  1,  1],
 					[  0,  1,  2]],
-		'factor': 1
+		'factor': 2
 
 	}
 ]

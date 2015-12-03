@@ -11,7 +11,7 @@ def main():
 	    os.makedirs(path)
 
 	try:
-		print "Welcome to Jack Cohen's CP467 Project!"
+		print "Filter/Thinning and Digit Recognition - by Jack Cohen"
 
 		cont = True
 		while (cont):

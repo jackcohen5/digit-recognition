@@ -1,2 +1,2 @@
- python src/CP467project.py
+ python src/digit-recognition.py
  
