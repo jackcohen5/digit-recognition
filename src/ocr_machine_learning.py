@@ -16,6 +16,8 @@ def compileImageDatabase(database):
         averageDigitVerticalHistogram = database[digit][0]['verticalHistogram']
         averageDigitHorizontalHistogram = database[digit][0]['horizontalHistogram']
         averageDigit20x10Grid = database[digit][0]['20x10grid']
+        averageDigit5x1Grid = database[digit][0]['5x1grid']
+        averageDigit1x5Grid = database[digit][0]['1x5grid']
 
         for image in range(0,len(database[digit])):
             averageDigitAspectRatio += database[digit][image]['aspectRatio']
@@ -28,6 +30,10 @@ def compileImageDatabase(database):
 
                 for squareIndex in range(0,len(database[digit][image]['20x10grid'])):
                     averageDigit20x10Grid[squareIndex] += database[digit][image]['20x10grid'][squareIndex]
+                for squareIndex in range(0,len(database[digit][image]['5x1grid'])):
+                    averageDigit5x1Grid[squareIndex] += database[digit][image]['5x1grid'][squareIndex]
+                for squareIndex in range(0,len(database[digit][image]['1x5grid'])):
+                    averageDigit1x5Grid[squareIndex] += database[digit][image]['1x5grid'][squareIndex]
 
         averageDigitAspectRatio = averageDigitAspectRatio/float(len(database[digit]))
 
@@ -37,12 +43,18 @@ def compileImageDatabase(database):
             averageDigitHorizontalHistogram[rowIndex] = float(averageDigitHorizontalHistogram[rowIndex])/float(len(database[digit]))
         for squareIndex in range(0,len(database[digit][image]['20x10grid'])):
             averageDigit20x10Grid[squareIndex] = float(averageDigit20x10Grid[squareIndex])/float(len(database[digit]))
+        for squareIndex in range(0,len(database[digit][image]['5x1grid'])):
+            averageDigit5x1Grid[squareIndex] = float(averageDigit5x1Grid[squareIndex])/float(len(database[digit]))
+        for squareIndex in range(0,len(database[digit][image]['1x5grid'])):
+            averageDigit1x5Grid[squareIndex] = float(averageDigit1x5Grid[squareIndex])/float(len(database[digit]))
 
         digitData = {
             'aspectRatio': averageDigitAspectRatio,
             'verticalHistogram': averageDigitVerticalHistogram,
             'horizontalHistogram': averageDigitHorizontalHistogram,
-            '20x10grid': averageDigit20x10Grid
+            '20x10grid': averageDigit20x10Grid,
+            '5x1grid': averageDigit5x1Grid,
+            '1x5grid': averageDigit1x5Grid
         }
         data.append(digitData)
 
@@ -83,26 +95,28 @@ def loadSampleImages():
 
     return data
 
-def getRecognized20x10GridDigit(original20x10Grid,data):
-    recognized20x10GridDigit = 0
+def getRecognizedMxNGridDigit(originalMxNGrid,data,M,N):
+    recognizedMxNGridDigit = 0
     gridDifference = 0
 
-    for squareIndex in range(0,len(data[0]['20x10grid'])):
-        gridDifference += abs(original20x10Grid[squareIndex] - data[0]['20x10grid'][squareIndex])
+    gridName = '{0}x{1}grid'.format(M,N)
+
+    for squareIndex in range(0,len(data[0][gridName])):
+        gridDifference += abs(originalMxNGrid[squareIndex] - data[0][gridName][squareIndex])
 
     for digit in range(0,10):
 
-        averageDigit20x10Grid = data[digit]['20x10grid']
-        temp20x10GridDifference = 0
+        averageDigitMxNGrid = data[digit][gridName]
+        tempMxNGridDifference = 0
 
-        for squareIndex in range(0,len(averageDigit20x10Grid)):
-            temp20x10GridDifference += abs(original20x10Grid[squareIndex] - averageDigit20x10Grid[squareIndex])
+        for squareIndex in range(0,len(averageDigitMxNGrid)):
+            tempMxNGridDifference += abs(originalMxNGrid[squareIndex] - averageDigitMxNGrid[squareIndex])
         
-        if temp20x10GridDifference < gridDifference:
-            gridDifference = temp20x10GridDifference
-            recognized20x10GridDigit = digit
+        if tempMxNGridDifference < gridDifference:
+            gridDifference = tempMxNGridDifference
+            recognizedMxNGridDigit = digit
 
-    return recognized20x10GridDigit
+    return recognizedMxNGridDigit
 
 def getRecognizedVerticalHistogramDigit(originalImageVerticalHistogram,data):
     recognizedVerticalHistogramDigit = 0
@@ -157,13 +171,21 @@ def getVector(originalImage, data):
     originalImage = originalImage.resize((resizeWidth, resizeHeight))
 
     original20x10Grid = ocr_utils.createMxNGrid(20,10,numpy.asarray(originalImage))
+    original5x1Grid = ocr_utils.createMxNGrid(5,1,numpy.asarray(originalImage))
+    original1x5Grid = ocr_utils.createMxNGrid(1,5,numpy.asarray(originalImage))
     originalImageVerticalHistogram = ocr_utils.createVerticalHistogram(numpy.asarray(originalImage))
     originalImageHorizontalHistogram = ocr_utils.createHorizontalHistogram(numpy.asarray(originalImage))
 
     featureVector = []
 
-    recognized20x10GridDigit = getRecognized20x10GridDigit(original20x10Grid,data)
+    recognized20x10GridDigit = getRecognizedMxNGridDigit(original20x10Grid,data,20,10)
     featureVector.append(recognized20x10GridDigit)
+
+    recognized5x1GridDigit = getRecognizedMxNGridDigit(original5x1Grid,data,5,1)
+    featureVector.append(recognized5x1GridDigit)
+
+    recognized1x5GridDigit = getRecognizedMxNGridDigit(original1x5Grid,data,1,5)
+    featureVector.append(recognized1x5GridDigit)
 
     recognizedVerticalHistogramDigit = getRecognizedVerticalHistogramDigit(originalImageVerticalHistogram,data)
     featureVector.append(recognizedVerticalHistogramDigit)

@@ -67,7 +67,7 @@ def createHorizontalHistogram(digitImageArray):
     return histogram
 
 
-# this assumes M divides 200 evenly and N divides 100 evenly
+# this assumes M divides 200 evenly and N divides 100 evenly - need to fix this
 def createMxNGrid(M,N,digitImageArray):
 
     grid = []
