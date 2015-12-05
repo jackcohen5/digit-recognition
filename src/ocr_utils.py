@@ -1,3 +1,7 @@
+import os
+from PIL import Image
+import utilities
+
 def findEndpoints(digitImageArray):
 
     endpoints = [ -1, -1, -1, -1] # endpoints = [left, top, right, bottom]
@@ -89,3 +93,38 @@ def createMxNGrid(M,N,digitImageArray):
             grid.append(int(totalPixelInSquare) - int(gridElementPixelCount))
 
     return grid
+
+def saveImageToCorrectDigitFolder(originalImage,correctDigit):
+    print 'Okay! Saving the image to the {0} digit bank...'.format(correctDigit)
+    digitImagePath = os.getcwd() + '/digits/{0}'.format(correctDigit)
+    numImages = 0
+
+    for imageFile in os.listdir(os.getcwd() + '/digits/{0}'.format(correctDigit)):
+        if imageFile.endswith(".tiff") or imageFile.endswith(".tif"):
+            numImages += 1
+
+    imageFileName = "{0}-{1}".format(correctDigit,numImages)
+    imagePath = os.getcwd() + '/digits/{0}/{1}.tif'.format(correctDigit, imageFileName)
+    originalImage.save(imagePath)
+    print 'Saved as {0}!'.format(imagePath)
+    return
+
+def guessedWrong(originalImage):
+    print 'WHOOPS!'
+    cont = True
+    while (cont):
+        correctDigit = raw_input("--> Please input the correct digit ('X' to exit): ")
+        if correctDigit == 'X' or correctDigit == 'x':
+            cont = False
+        else:
+            if utilities.isInteger(correctDigit):
+                for i in range (0,10):
+                    if correctDigit == "{0}".format(i):
+                        saveImageToCorrectDigitFolder(originalImage,correctDigit)
+                        print "Please go back to the main menu and restart the Digit Recognition program to reload the new image into the database!"
+                        cont = False
+                if cont:
+                    print "Command must be an integer from [0,10], or 'X' to exit!"
+            else:
+                print "Command must be an integer from [0,10], or 'X' to exit!"
+    return

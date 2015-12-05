@@ -1,7 +1,10 @@
 from Tkinter import Tk,Canvas,Button
 from PIL import Image,ImageDraw,ImageOps
 import ocr_machine_learning
+import ocr_utils
 import digitASCII
+import os
+import utilities
 
 canvasWidth = 100
 canvasHeight = 200
@@ -10,6 +13,7 @@ class DrawDigit(object):
 
 	def __init__(self, digitsData):
 		self.digitsData = digitsData
+		self.checkingDigit = False
 
 		self.master = Tk()
 		self.master.title("Draw Digit")
@@ -29,6 +33,12 @@ class DrawDigit(object):
 		self.clearButton = Button(self.master, text="Clear", command=self.clearCanvas)
 		self.clearButton.pack()
 
+		self.rightButton = Button(self.master, text="Right!", command=self.digitRecognized)
+		self.rightButton.pack_forget()
+
+		self.wrongButton = Button(self.master, text="Wrong!", command=self.digitNotRecognized)
+		self.wrongButton.pack_forget()
+
 		self.master.bind('<Button-1>', self.mousePress)
 		self.master.bind('<B1-Motion>', self.mouseMove)
 		self.master.bind('<ButtonRelease-1>', self.mouseRelease) 
@@ -40,14 +50,14 @@ class DrawDigit(object):
 
 
 	def mousePress(self, event):
-		if not self.isClicking:
+		if not self.isClicking and not self.checkingDigit:
 			self.currentX = event.x
 			self.currentY = event.y
 			self.isClicking = True
 		return
 
 	def mouseMove(self, event):
-		if self.isClicking:
+		if self.isClicking and not self.checkingDigit:
 			self.draw.line([(self.currentX,self.currentY),(event.x,event.y)],(0,0,0),width=5)
 			self.canvas.create_line(self.currentX, self.currentY, event.x, event.y, width=5.0)
 			self.currentX = event.x
@@ -65,23 +75,63 @@ class DrawDigit(object):
 		return
 
 	def recognize(self):
+		self.checkingDigit = True
 
+		self.originalImage = ImageOps.invert(self.image)
 		print "***************************************************"
 		print 'Recognizing the digit...'
 
-		featureVector = ocr_machine_learning.getVector(ImageOps.invert(self.image), self.digitsData)
+		featureVector = ocr_machine_learning.getVector(self.originalImage, self.digitsData)
 		print 'The feature vector for the image is: {0}'.format(featureVector)
-		print "***************************************************"
 
 		finalDigit = ocr_machine_learning.recognizeDigit(featureVector)
 		print 'The digit in the image is:'
 		print digitASCII.digits[finalDigit]
-		print "***************************************************"
 
-		self.clearCanvas()
+		self.checkCorrectDigitGUI(finalDigit)
+
 		return
 
 	def startGUI(self):
 		print 'Please draw the digit in the white square of the GUI window...'
 		self.master.mainloop()
+		return
+
+	def checkCorrectDigitGUI(self, finalDigit):
+
+		self.finalDigit = finalDigit
+
+		self.recognizeButton.pack_forget()
+		self.clearButton.pack_forget()
+		self.rightButton.pack()
+		self.wrongButton.pack()
+		
+		self.master.update()
+
+		return
+
+	def digitRecognized(self):
+		ocr_utils.saveImageToCorrectDigitFolder(self.originalImage, self.finalDigit)
+		self.resetGUI()
+		return
+
+	def digitNotRecognized(self):
+		ocr_utils.guessedWrong(self.originalImage)
+		self.resetGUI()
+		return
+
+	def resetGUI(self):
+		self.clearCanvas()
+
+		self.rightButton.pack_forget()
+		self.wrongButton.pack_forget()
+		self.canvas.pack()
+		self.recognizeButton.pack()
+		self.clearButton.pack()
+
+		self.checkingDigit = False
+		print "***************************************************"
+		print "Please draw another digit..."
+
+		self.master.update()
 		return

@@ -1,4 +1,5 @@
 import ocr_machine_learning
+import ocr_utils
 from PIL import Image
 import os
 import digitASCII
@@ -47,19 +48,34 @@ def openImageOCR(digitsData):
 		print 'Converting the original file to grayscale and displaying...'
 		originalImage.show()
 		print "***************************************************"
-
 		print 'Recognizing the digit...'
 
 		featureVector = ocr_machine_learning.getVector(originalImage,digitsData)
 		print 'The feature vector for the image is: {0}'.format(featureVector)
-		print "***************************************************"
 
 		finalDigit = ocr_machine_learning.recognizeDigit(featureVector)
 		print 'The digit in the image is:'
 		print digitASCII.digits[finalDigit]
-		print "***************************************************"
+
+		checkCorrectDigitCommandLine(finalDigit,originalImage)
 
 	except Exception, e:
 		print "Error opening the file!"
 
+	return
+
+def checkCorrectDigitCommandLine(finalDigit, originalDigitImage):
+	cont = True
+	while (cont):
+		digitRecognized = raw_input('--> Was I right (Y)es or (N)o? (0 to exit): ')
+		if digitRecognized == '0':
+			cont = False
+		elif digitRecognized == 'Y' or digitRecognized =='y':
+			ocr_utils.saveImageToCorrectDigitFolder(originalDigitImage,finalDigit)
+			cont = False
+		elif digitRecognized == 'N' or digitRecognized =='n':
+			ocr_utils.guessedWrong(originalDigitImage)
+			cont = False
+		else:
+			print "Command must be Y(es), N(o), or 0 to exit!"
 	return

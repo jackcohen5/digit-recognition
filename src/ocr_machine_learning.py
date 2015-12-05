@@ -72,7 +72,7 @@ def loadSampleImages():
         print 'Loading files for digit {0}...'.format(index)
 
         for imageFile in os.listdir(fullPath):
-            if imageFile.endswith(".tif"): 
+            if imageFile.endswith(".tif") or imageFile.endswith(".tiff"): 
 
                 digitImageAnalysis = {}
 
@@ -199,4 +199,20 @@ def getVector(originalImage, data):
     return featureVector
 
 def recognizeDigit(featureVector):
+
+    for index in range(0,3):
+        if index < 3:
+            featureVector.append(featureVector[0]) # 20x10 grid has 4x weight
+        if index < 2:
+            featureVector.append(featureVector[1]) # 5x1 grid has 3x weight
+            featureVector.append(featureVector[2]) # 1x5 grid has 3x weight
+        if index < 1:
+            featureVector.append(featureVector[3]) # vertical histogram has 2x weight
+            featureVector.append(featureVector[4]) # horizontal histogram has 2x weight
+        if index < 0:
+            featureVector.append(featureVector[5]) # aspect ratio has only 1x weight
+
+    print featureVector
+
     return utilities.findArrayMode(featureVector)
+
