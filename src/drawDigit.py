@@ -75,20 +75,21 @@ class DrawDigit(object):
 		return
 
 	def recognize(self):
-		self.checkingDigit = True
+		if len(self.canvas.find_all()) != 0:
+			self.checkingDigit = True
 
-		self.originalImage = ImageOps.invert(self.image)
-		print "***************************************************"
-		print 'Recognizing the digit...'
+			self.originalImage = ImageOps.invert(self.image)
+			print "***************************************************"
+			print 'Recognizing the digit...'
 
-		featureVector = ocr_machine_learning.getVector(self.originalImage, self.digitsData)
-		print 'The feature vector for the image is: {0}'.format(featureVector)
+			featureVector = ocr_machine_learning.getVector(self.originalImage, self.digitsData)
+			print 'The feature vector for the image is: {0}'.format(featureVector)
 
-		finalDigit = ocr_machine_learning.recognizeDigit(featureVector)
-		print 'The digit in the image is:'
-		print digitASCII.digits[finalDigit]
+			finalDigit = ocr_machine_learning.recognizeDigit(featureVector)
+			print 'The digit in the image is:'
+			print digitASCII.digits[finalDigit]
 
-		self.checkCorrectDigitGUI(finalDigit)
+			self.checkCorrectDigitGUI(finalDigit)
 
 		return
 

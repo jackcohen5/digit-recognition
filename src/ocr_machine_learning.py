@@ -15,6 +15,8 @@ def compileImageDatabase(database):
         averageDigitAspectRatio = 0
         averageDigitVerticalHistogram = database[digit][0]['verticalHistogram']
         averageDigitHorizontalHistogram = database[digit][0]['horizontalHistogram']
+        averageDigit50x25Grid = database[digit][0]['50x25grid']
+        averageDigit40x20Grid = database[digit][0]['40x20grid']
         averageDigit20x10Grid = database[digit][0]['20x10grid']
         averageDigit5x1Grid = database[digit][0]['5x1grid']
         averageDigit1x5Grid = database[digit][0]['1x5grid']
@@ -28,6 +30,10 @@ def compileImageDatabase(database):
                 for rowIndex in range(0,len(database[digit][image]['horizontalHistogram'])):
                     averageDigitHorizontalHistogram[rowIndex] += database[digit][image]['horizontalHistogram'][rowIndex]
 
+                for squareIndex in range(0,len(database[digit][image]['50x25grid'])):
+                    averageDigit50x25Grid[squareIndex] += database[digit][image]['50x25grid'][squareIndex]
+                for squareIndex in range(0,len(database[digit][image]['40x20grid'])):
+                    averageDigit40x20Grid[squareIndex] += database[digit][image]['40x20grid'][squareIndex]
                 for squareIndex in range(0,len(database[digit][image]['20x10grid'])):
                     averageDigit20x10Grid[squareIndex] += database[digit][image]['20x10grid'][squareIndex]
                 for squareIndex in range(0,len(database[digit][image]['5x1grid'])):
@@ -41,6 +47,10 @@ def compileImageDatabase(database):
             averageDigitVerticalHistogram[columnIndex] = float(averageDigitVerticalHistogram[columnIndex])/float(len(database[digit]))
         for rowIndex in range(0, len(averageDigitHorizontalHistogram)):
             averageDigitHorizontalHistogram[rowIndex] = float(averageDigitHorizontalHistogram[rowIndex])/float(len(database[digit]))
+        for squareIndex in range(0,len(database[digit][image]['50x25grid'])):
+            averageDigit50x25Grid[squareIndex] = float(averageDigit50x25Grid[squareIndex])/float(len(database[digit]))
+        for squareIndex in range(0,len(database[digit][image]['40x20grid'])):
+            averageDigit40x20Grid[squareIndex] = float(averageDigit40x20Grid[squareIndex])/float(len(database[digit]))
         for squareIndex in range(0,len(database[digit][image]['20x10grid'])):
             averageDigit20x10Grid[squareIndex] = float(averageDigit20x10Grid[squareIndex])/float(len(database[digit]))
         for squareIndex in range(0,len(database[digit][image]['5x1grid'])):
@@ -52,6 +62,8 @@ def compileImageDatabase(database):
             'aspectRatio': averageDigitAspectRatio,
             'verticalHistogram': averageDigitVerticalHistogram,
             'horizontalHistogram': averageDigitHorizontalHistogram,
+            '50x25grid': averageDigit50x25Grid,
+            '40x20grid': averageDigit40x20Grid,
             '20x10grid': averageDigit20x10Grid,
             '5x1grid': averageDigit5x1Grid,
             '1x5grid': averageDigit1x5Grid
@@ -69,7 +81,7 @@ def loadSampleImages():
         digitData = []
 
         fullPath = os.getcwd() + '/digits/{0}/'.format(index)
-        print 'Loading files for digit {0}...'.format(index)
+        print 'Loading the image files for digit {0}...'.format(index)
 
         for imageFile in os.listdir(fullPath):
             if imageFile.endswith(".tif") or imageFile.endswith(".tiff"): 
@@ -170,6 +182,8 @@ def getVector(originalImage, data):
     originalImage = originalImage.crop(ocr_utils.findEndpoints(originalImageArray))
     originalImage = originalImage.resize((resizeWidth, resizeHeight))
 
+    original50x25Grid = ocr_utils.createMxNGrid(50,25,numpy.asarray(originalImage))
+    original40x20Grid = ocr_utils.createMxNGrid(40,20,numpy.asarray(originalImage))
     original20x10Grid = ocr_utils.createMxNGrid(20,10,numpy.asarray(originalImage))
     original5x1Grid = ocr_utils.createMxNGrid(5,1,numpy.asarray(originalImage))
     original1x5Grid = ocr_utils.createMxNGrid(1,5,numpy.asarray(originalImage))
@@ -177,6 +191,12 @@ def getVector(originalImage, data):
     originalImageHorizontalHistogram = ocr_utils.createHorizontalHistogram(numpy.asarray(originalImage))
 
     featureVector = []
+
+    recognized50x25GridDigit = getRecognizedMxNGridDigit(original50x25Grid,data,50,25)
+    featureVector.append(recognized50x25GridDigit)
+
+    recognized40x20GridDigit = getRecognizedMxNGridDigit(original40x20Grid,data,40,20)
+    featureVector.append(recognized40x20GridDigit)
 
     recognized20x10GridDigit = getRecognizedMxNGridDigit(original20x10Grid,data,20,10)
     featureVector.append(recognized20x10GridDigit)
@@ -200,17 +220,20 @@ def getVector(originalImage, data):
 
 def recognizeDigit(featureVector):
 
-    for index in range(0,3):
+    for index in range(0,4):
+        if index < 4:
+            featureVector.append(featureVector[0]) # 50x25 grid has 5x weight
+            featureVector.append(featureVector[1]) # 40x20 grid has 5x weight
         if index < 3:
-            featureVector.append(featureVector[0]) # 20x10 grid has 4x weight
+            featureVector.append(featureVector[2]) # 20x10 grid has 4x weight
         if index < 2:
-            featureVector.append(featureVector[1]) # 5x1 grid has 3x weight
-            featureVector.append(featureVector[2]) # 1x5 grid has 3x weight
+            featureVector.append(featureVector[3]) # 5x1 grid has 3x weight
+            featureVector.append(featureVector[4]) # 1x5 grid has 3x weight
         if index < 1:
-            featureVector.append(featureVector[3]) # vertical histogram has 2x weight
-            featureVector.append(featureVector[4]) # horizontal histogram has 2x weight
+            featureVector.append(featureVector[5]) # vertical histogram has 2x weight
+            featureVector.append(featureVector[6]) # horizontal histogram has 2x weight
         if index < 0:
-            featureVector.append(featureVector[5]) # aspect ratio has only 1x weight
+            featureVector.append(featureVector[7]) # aspect ratio has only 1x weight
 
     print featureVector
 
