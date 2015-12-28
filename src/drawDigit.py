@@ -39,6 +39,9 @@ class DrawDigit(object):
 		self.wrongButton = Button(self.master, text="Wrong!", command=self.digitNotRecognized)
 		self.wrongButton.pack_forget()
 
+		self.retryButton = Button(self.master, text="Retry!", command=self.resetGUI)
+		self.retryButton.pack_forget()
+
 		self.master.bind('<Button-1>', self.mousePress)
 		self.master.bind('<B1-Motion>', self.mouseMove)
 		self.master.bind('<ButtonRelease-1>', self.mouseRelease) 
@@ -106,6 +109,7 @@ class DrawDigit(object):
 		self.clearButton.pack_forget()
 		self.rightButton.pack()
 		self.wrongButton.pack()
+		self.retryButton.pack()
 		
 		self.master.update()
 
@@ -126,6 +130,7 @@ class DrawDigit(object):
 
 		self.rightButton.pack_forget()
 		self.wrongButton.pack_forget()
+		self.retryButton.pack_forget()
 		self.canvas.pack()
 		self.recognizeButton.pack()
 		self.clearButton.pack()
